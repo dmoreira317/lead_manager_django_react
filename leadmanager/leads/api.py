@@ -12,4 +12,3 @@ class LeadViewSet(viewsets.ModelViewSet):
     ]
     serializer_class = LeadSerializer
 
-    

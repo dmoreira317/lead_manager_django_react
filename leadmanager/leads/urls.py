@@ -1,5 +1,5 @@
 from rest_framework import routers, urlpatterns
-from .api import LeadViewSet
+from leads.api import LeadViewSet
 
 router = routers.DefaultRouter()
 router.register('api/leads', LeadViewSet, 'leads')
