@@ -1,7 +1,7 @@
 // here we make all our http requests, here the actions take place
-
 import axios from "axios";
-import { GET_LEADS, DELETE_LEAD, ADD_LEAD } from "./types";
+import { createMessage } from "./messages";
+import { GET_LEADS, DELETE_LEAD, ADD_LEAD, GET_ERRORS } from "./types";
 
 // action method GET LEADS, dispatch sends the action to the leads reducer. this is called from the leads component /components/leads/Leads
 
@@ -22,6 +22,8 @@ export const deleteLead = (id) => (dispatch) => {
   axios
     .delete(`/api/leads/${id}/`)
     .then((res) => {
+      //here i will send the prop msg to the create message action, which will send the CREATE_MESSAGE type to the messaeges reducer, which will set the state to that message, and GET_MESSAGES will return that message, which will be sent to alerts to show on screen.
+      dispatch(createMessage({ leadDeleted: "Lead deleted" }));
       dispatch({
         //once it gets sent to the server, i want to say DELETE_LEAD
         type: DELETE_LEAD,
@@ -32,16 +34,25 @@ export const deleteLead = (id) => (dispatch) => {
 };
 
 // ADD lead
-
 export const addLead = (lead) => (dispatch) => {
   axios
     .post(`/api/leads/`, lead)
     .then((res) => {
+      dispatch(createMessage({ leadAdded: "Lead added" }));
       dispatch({
         //once it gets sent to the server, i want to say ADD_LEAD
         type: ADD_LEAD,
         payload: res.data,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const errors = {
+        msg: err.response.data,
+        status: err.response.status,
+      };
+      dispatch({
+        type: GET_ERRORS,
+        payload: errors,
+      });
+    });
 };

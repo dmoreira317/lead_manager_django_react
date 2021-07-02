@@ -27,6 +27,13 @@ export class Form extends Component {
 
     //we pass the lead to the addLead action, which goes to the connect action and sends it to the actual action funciton addLead.
     this.props.addLead(lead);
+
+    //delete after submit
+    this.setState({
+      name: "",
+      email: "",
+      message: "",
+    });
   };
 
   render() {
