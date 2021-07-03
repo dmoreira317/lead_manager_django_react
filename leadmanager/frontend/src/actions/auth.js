@@ -11,29 +11,13 @@ import {
 } from "./types";
 
 // Check the token and load the user:
-
 export const loadUser = () => (dispatch, getState) => {
   //User loading
   dispatch({ type: USER_LOADING });
 
-  //Get token from state
-  const token = getState().auth.token;
-
-  //Headers to send on the request
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
-
-  // If token, add to headers config
-  if (token) {
-    config.headers["Authorization"] = `Token ${token}`;
-  }
-
   // making the request with the config
   axios
-    .get("./api/auth/user", config)
+    .get("./api/auth/user", tokenConfig(getState))
     .then((res) => {
       dispatch({
         type: USER_LOADED,
@@ -47,7 +31,6 @@ export const loadUser = () => (dispatch, getState) => {
 };
 
 // Login user:
-
 export const login = (username, password) => (dispatch) => {
   //Headers to send on the request
   const config = {
@@ -76,6 +59,21 @@ export const login = (username, password) => (dispatch) => {
 
 // Logout user:
 export const logout = () => (dispatch, getState) => {
+  // making the request with the config, we need to pass null as body here for this to work
+  axios
+    .post("./api/auth/logout", null, tokenConfig(getState))
+    .then((res) => {
+      dispatch({
+        type: LOGOUT_SUCCESS,
+      });
+    })
+    .catch((err) => {
+      dispatch(returnErrors(err.response.data, err.response.status));
+    });
+};
+
+// Set up config with token - helper function
+export const tokenConfig = (getState) => {
   //Get token from state
   const token = getState().auth.token;
 
@@ -91,15 +89,5 @@ export const logout = () => (dispatch, getState) => {
     config.headers["Authorization"] = `Token ${token}`;
   }
 
-  // making the request with the config, we need to pass null as body here for this to work
-  axios
-    .post("./api/auth/logout", null, config)
-    .then((res) => {
-      dispatch({
-        type: LOGOUT_SUCCESS,
-      });
-    })
-    .catch((err) => {
-      dispatch(returnErrors(err.response.data, err.response.status));
-    });
+  return config;
 };
