@@ -2,12 +2,13 @@
 import axios from "axios";
 import { createMessage, returnErrors } from "./messages";
 import { GET_LEADS, DELETE_LEAD, ADD_LEAD } from "./types";
+import { tokenConfig } from "./auth";
 
 // action method GET LEADS, dispatch sends the action to the leads reducer. this is called from the leads component /components/leads/Leads
 
-export const getLeads = () => (dispatch) => {
+export const getLeads = () => (dispatch, getState) => {
   axios
-    .get("/api/leads/")
+    .get("/api/leads/", tokenConfig(getState))
     .then((res) => {
       dispatch({
         type: GET_LEADS,
@@ -20,9 +21,9 @@ export const getLeads = () => (dispatch) => {
 };
 
 // delete lead, takes in an id
-export const deleteLead = (id) => (dispatch) => {
+export const deleteLead = (id) => (dispatch, getState) => {
   axios
-    .delete(`/api/leads/${id}/`)
+    .delete(`/api/leads/${id}/`, tokenConfig(getState))
     .then((res) => {
       //here i will send the prop msg to the create message action, which will send the CREATE_MESSAGE type to the messaeges reducer, which will set the state to that message, and GET_MESSAGES will return that message, which will be sent to alerts to show on screen.
       dispatch(createMessage({ leadDeleted: "Lead deleted" }));
@@ -36,9 +37,9 @@ export const deleteLead = (id) => (dispatch) => {
 };
 
 // ADD lead
-export const addLead = (lead) => (dispatch) => {
+export const addLead = (lead) => (dispatch, getState) => {
   axios
-    .post(`/api/leads/`, lead)
+    .post(`/api/leads/`, lead, tokenConfig(getState))
     .then((res) => {
       dispatch(createMessage({ leadAdded: "Lead added" }));
       dispatch({
